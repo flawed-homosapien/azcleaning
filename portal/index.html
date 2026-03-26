@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>QuickQleen</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .bg-cream { background-color: #F9F7F2; }
+        .text-forest { color: #2D5A27; }
+        .bg-forest { background-color: #2D5A27; }
+        .bg-orange-accent { background-color: #FF8A00; }
+        [x-cloak] { display: none !important; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #F9F7F2; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #2D5A27; border-radius: 10px; }
+        body { height: 100vh; overflow: hidden; }
+    </style>
+</head>
+<body class="bg-cream font-sans" 
+      x-data="{ mobileMenu: false, tab: 'dashboard', notifications: false }"
+      x-init="$watch('tab', () => { $refs.scrollContainer.scrollTop = 0 })">
+
+    <header class="lg:hidden bg-forest p-4 flex justify-between items-center text-white shadow-lg sticky top-0 z-50 shrink-0">
+        <h1 class="font-bold tracking-tight italic text-xl">we clean.</h1>
+        <div class="flex items-center space-x-4">
+            <div class="relative">
+                <button @click="notifications = !notifications" class="relative focus:outline-none">
+                    <i class="fas fa-bell"></i>
+                    <span class="absolute -top-1 -right-1 bg-orange-500 w-2 h-2 rounded-full border border-forest"></span>
+                </button>
+                
+                <div x-show="notifications" 
+                     @click.away="notifications = false" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     class="absolute right-0 mt-4 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[70] p-4 text-gray-800" 
+                     x-cloak>
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-black text-xs uppercase text-forest">Recent Alerts</h4>
+                        <span class="text-[10px] bg-cream px-2 py-1 rounded font-bold">2 New</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="text-[11px] p-3 bg-cream rounded-xl font-bold border-l-4 border-orange-500 shadow-sm">
+                            <p>New Booking: ₦25,000</p>
+                            <span class="text-[9px] opacity-50 uppercase">2 mins ago</span>
+                        </div>
+                        <div class="text-[11px] p-3 bg-cream rounded-xl font-bold border-l-4 border-forest shadow-sm">
+                            <p>Cleaner Arrived at Uyo Site</p>
+                            <span class="text-[9px] opacity-50 uppercase">1 hour ago</span>
+                        </div>
+                    </div>
+                    <button class="w-full mt-3 py-2 text-[10px] font-black uppercase text-gray-400 hover:text-forest transition">Clear All</button>
+                </div>
+            </div>
+    
+            <button @click="mobileMenu = !mobileMenu; notifications = false" class="text-2xl focus:outline-none">
+                <i class="fas" :class="mobileMenu ? 'fa-times' : 'fa-bars'"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex h-full overflow-hidden">
+        <aside :class="mobileMenu ? 'translate-x-0' : '-translate-x-full'" 
+               class="fixed inset-y-0 left-0 z-[60] w-64 bg-forest text-white flex flex-col p-6 transition-transform duration-300 lg:relative lg:translate-x-0 shrink-0">
+            <h1 class="hidden lg:block text-2xl font-bold mb-10 tracking-tight italic underline decoration-orange-400 underline-offset-8">we clean.</h1>
+            
+            <nav class="space-y-2 flex-1 text-sm font-bold">
+                <button @click="tab = 'dashboard'; mobileMenu = false" :class="tab === 'dashboard' ? 'bg-white/10 border-l-4 border-orange-400' : 'opacity-60'" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 transition">
+                    <i class="fas fa-th-large w-5"></i> <span>Dashboard</span>
+                </button>
+                <button @click="tab = 'bookings'; mobileMenu = false" :class="tab === 'bookings' ? 'bg-white/10 border-l-4 border-orange-400' : 'opacity-60'" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 transition">
+                    <i class="fas fa-calendar-check w-5"></i> <span>Bookings</span>
+                </button>
+                <button @click="tab = 'cleaners'; mobileMenu = false" :class="tab === 'cleaners' ? 'bg-white/10 border-l-4 border-orange-400' : 'opacity-60'" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 transition">
+                    <i class="fas fa-broom w-5"></i> <span>Cleaners Squad</span>
+                </button>
+                <button @click="tab = 'analytics'; mobileMenu = false" :class="tab === 'analytics' ? 'bg-white/10 border-l-4 border-orange-400' : 'opacity-60'" class="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 transition">
+                    <i class="fas fa-chart-line w-5"></i> <span>Revenue Lab</span>
+                </button>
+            </nav>
+            
+            <div class="pt-6 border-t border-white/10">
+                <p class="text-[10px] opacity-40 mb-4 uppercase font-black tracking-widest text-orange-200">System Preferences</p>
+                <button @click="tab = 'settings'; mobileMenu = false" :class="tab === 'settings' ? 'text-white' : 'text-orange-200 opacity-60'" class="flex items-center space-x-3 p-3 hover:text-white transition text-sm font-bold w-full text-left">
+                    <i class="fas fa-cog"></i> <span>Settings</span>
+                </button>
+                <a href="#" class="flex items-center space-x-3 p-3 text-red-300 hover:text-red-400 transition text-sm font-bold opacity-60 mt-2"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <main x-ref="scrollContainer" class="flex-1 overflow-y-auto p-4 lg:p-10 custom-scroll pb-32 relative">
+            
+            <div class="hidden lg:flex justify-end items-center space-x-6 mb-8">
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="text-forest hover:text-orange-500 transition relative">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-orange-500 w-4 h-4 rounded-full border-2 border-cream text-[8px] flex items-center justify-center text-white">2</span>
+                    </button>
+                    <div x-show="open" @click.away="open = false" class="absolute right-0 mt-4 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 p-4" x-cloak>
+                        <h4 class="font-black text-xs uppercase mb-3">Alerts</h4>
+                        <div class="space-y-3">
+                        <div class="text-[11px] p-3 bg-cream rounded-xl font-bold border-l-4 border-orange-500 shadow-sm">
+                            <p>New Booking: ₦25,000</p>
+                            <span class="text-[9px] opacity-50 uppercase">2 mins ago</span>
+                        </div>
+                        <div class="text-[11px] p-3 bg-cream rounded-xl font-bold border-l-4 border-forest shadow-sm">
+                            <p>Cleaner Arrived at Uyo Site</p>
+                            <span class="text-[9px] opacity-50 uppercase">1 hour ago</span>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3 bg-white p-2 pr-6 rounded-full shadow-sm">
+                    <div class="w-8 h-8 rounded-full bg-forest text-white flex items-center justify-center font-bold text-xs italic">A</div>
+                    <span class="text-xs font-black text-forest italic">Abigail Admin</span>
+                </div>
+            </div>
+
+            <div x-show="tab === 'dashboard'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-10 gap-4">
+                    <div>
+                        <h2 class="text-3xl lg:text-4xl font-bold text-forest italic">Operations Board</h2>
+                    </div>
+                    <button class="bg-orange-accent text-white px-8 py-4 rounded-full font-bold shadow-xl hover:scale-105 transition active:scale-95 text-sm uppercase">+ Manual Entry</button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border-l-8 border-forest"><p class="text-gray-400 text-xs font-black uppercase">Daily Revenue</p><h3 class="text-3xl font-bold text-forest mt-1">₦50,240</h3></div>
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border-l-8 border-orange-400"><p class="text-gray-400 text-xs font-black uppercase">Active Jobs</p><h3 class="text-3xl font-bold text-orange-500 mt-1">12</h3></div>
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border-l-8 border-forest"><p class="text-gray-400 text-xs font-black uppercase">Avg. Rating</p><h3 class="text-3xl font-bold text-forest mt-1">4.9/5</h3></div>
+                </div>
+                
+                <div class="bg-white rounded-[2.5rem] shadow-sm overflow-hidden border border-gray-100">
+                    <div class="p-8 border-b border-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold text-forest text-xl italic">Recent Check-ins</h3>
+                        <button class="text-orange-500 font-bold text-xs uppercase tracking-widest hover:underline">Full Audit</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-black">
+                                <tr>
+                                    <th class="p-6">Client</th>
+                                    <th class="p-6">Service Type</th>
+                                    <th class="p-6">Professional</th>
+                                    <th class="p-6">Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <tr class="hover:bg-cream/30 transition">
+                                    <td class="p-6 font-bold text-gray-800">Sarah Jenkins</td>
+                                    <td class="p-6"><span class="bg-forest/10 text-forest px-4 py-1 rounded-full text-[10px] font-black uppercase">Deep Clean</span></td>
+                                    <td class="p-6 flex items-center space-x-3 text-sm">
+                                        <div class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 font-bold">MT</div>
+                                        <span class="font-bold">Mike T.</span>
+                                    </td>
+                                    <td class="p-6"><span class="text-orange-500 text-xs font-black uppercase tracking-tighter italic">● On Site</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="tab === 'bookings'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+                <div class="flex flex-col lg:flex-row justify-between lg:items-center mb-10 gap-4">
+                    <h2 class="text-3xl font-bold text-forest italic underline underline-offset-8 decoration-orange-400">Live Booking Feed</h2>
+                    <div class="flex items-center space-x-2 bg-white px-4 py-2 rounded-2xl shadow-sm border border-gray-50 flex-1 lg:max-w-md">
+                        <i class="fas fa-search text-gray-300"></i>
+                        <input type="text" placeholder="Search Client or ID..." class="bg-transparent border-none focus:outline-none text-sm w-full font-medium">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-6">
+                    <template x-for="i in [1,2,3]" :key="i">
+                        <div class="bg-white p-6 lg:p-8 rounded-[2.5rem] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-xl transition-all border border-gray-50">
+                            <div class="flex items-center space-x-5">
+                                <div class="w-16 h-16 bg-cream rounded-[1.5rem] flex items-center justify-center text-forest text-xl font-black shadow-inner">JD</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-black text-gray-800 text-lg tracking-tight">John Doe</p>
+                                        <span class="text-[10px] bg-gray-100 px-2 py-0.5 rounded text-gray-400">#BK-9920</span>
+                                    </div>
+                                    <p class="text-xs text-forest italic font-bold mt-1">Deep Kitchen Clean • Today, 2:00 PM</p>
+                                    <p class="text-[10px] text-gray-400 mt-1 uppercase font-bold"><i class="fas fa-map-marker-alt mr-1"></i> 123 Forest Lane, Uyo</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 bg-cream/50 p-3 rounded-2xl">
+                                <select class="text-xs p-3 bg-white rounded-xl border-none outline-none font-bold text-gray-600 shadow-sm">
+                                    <option>Select Cleaner...</option>
+                                    <option>Maria G. (Available)</option>
+                                    <option>Michael S. (Busy)</option>
+                                    <option>David O. (Available)</option>
+                                </select>
+                                <button class="bg-forest text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-orange-accent transition shadow-lg shadow-forest/20">Dispatch</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            
+            <div x-show="tab === 'cleaners'" x-transition x-cloak>
+                <div class="flex flex-col lg:flex-row justify-between lg:items-center mb-10 gap-4">
+                     <h2 class="text-3xl font-bold text-forest italic mb-10">Cleaner Management</h2>
+                    <div class="flex items-center space-x-2 bg-white px-4 py-2 rounded-2xl shadow-sm border border-gray-50 flex-1 lg:max-w-md">
+                        <i class="fas fa-search text-gray-300"></i>
+                        <input type="text" placeholder="Search Agent or ID..." class="bg-transparent border-none focus:outline-none text-sm w-full font-medium">
+                    </div>
+                </div>
+               
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    <template x-for="i in [1,2,3]" :key="i">
+                        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 flex flex-col items-center text-center shadow-sm group hover:border-forest transition">
+                            <div class="relative">
+                                <div class="w-24 h-24 rounded-[2rem] bg-cream flex items-center justify-center text-forest text-3xl font-bold shadow-inner">M</div>
+                                <div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-4 border-white rounded-full"></div>
+                            </div>
+                            <h4 class="font-black text-xl mt-4 text-gray-800">Michael S.</h4>
+                            <p class="text-xs text-orange-500 font-black uppercase tracking-widest mt-1">Master Professional</p>
+                            <div class="flex text-orange-400 space-x-1 my-4">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <div class="flex gap-2 w-full">
+                                <button class="flex-1 py-3 bg-cream rounded-xl text-xs font-bold text-forest hover:bg-forest hover:text-white transition">History</button>
+                                <button @click="alert('Connecting to secure chat...')" class="p-3 bg-cream rounded-xl text-forest hover:text-orange-500 transition"><i class="fas fa-envelope"></i></button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            
+            <div x-show="tab === 'analytics'" x-transition x-cloak>
+                <h2 class="text-3xl font-bold text-forest italic mb-10">Revenue Lab</h2>
+                <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-gray-100 flex flex-col justify-center items-center text-center">
+                    <div class="w-24 h-24 bg-cream rounded-[2rem] flex items-center justify-center mb-6 text-forest">
+                        <i class="fas fa-chart-line text-4xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-800 italic">Data Pipeline Active</h3>
+                    <p class="text-gray-400 max-w-sm mt-4 leading-relaxed font-medium">Your integration is syncing. Financial reports will be available once the next billing cycle completes.</p>
+                </div>
+            </div>
+
+            <div x-show="tab === 'settings'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+                <h2 class="text-3xl font-bold text-forest italic mb-10">System Settings</h2>
+                
+                <div class="max-w-4xl space-y-8">
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-50">
+                        <h4 class="text-xs font-black uppercase tracking-widest text-forest mb-6 border-b pb-4">Profile & Store Info</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 px-2">Store Name</label>
+                                <input type="text" value="Quickleen.xyz" class="w-full bg-cream/50 p-4 rounded-2xl border-none font-bold text-forest focus:ring-2 ring-forest/20 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black uppercase text-gray-400 mb-2 px-2">Contact Email</label>
+                                <input type="email" value="admin@quickleen.xyz" class="w-full bg-cream/50 p-4 rounded-2xl border-none font-bold text-forest focus:ring-2 ring-forest/20 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-50">
+                        <h4 class="text-xs font-black uppercase tracking-widest text-forest mb-6 border-b pb-4">Operational Toggles</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-4 bg-cream/30 rounded-2xl">
+                                <div>
+                                    <p class="font-bold text-forest text-sm italic">Auto-Dispatch Mode</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">Assign nearest cleaner automatically</p>
+                                </div>
+                                <div x-data="{ on: true }" @click="on = !on" class="w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200" :class="on ? 'bg-forest' : 'bg-gray-200'">
+                                    <div class="bg-white w-4 h-4 rounded-full transition-transform" :class="on ? 'translate-x-6' : ''"></div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-cream/30 rounded-2xl">
+                                <div>
+                                    <p class="font-bold text-forest text-sm italic">SMS Client Alerts</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">Notify clients on arrival/departure</p>
+                                </div>
+                                <div x-data="{ on: false }" @click="on = !on" class="w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200" :class="on ? 'bg-forest' : 'bg-gray-200'">
+                                    <div class="bg-white w-4 h-4 rounded-full transition-transform" :class="on ? 'translate-x-6' : ''"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="bg-forest text-white px-12 py-4 rounded-full font-black uppercase tracking-widest text-xs shadow-lg shadow-forest/20 hover:scale-105 transition">Update Master Config</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div x-show="mobileMenu" @click="mobileMenu = false" x-transition x-cloak class="fixed inset-0 bg-forest/40 backdrop-blur-sm z-40 lg:hidden"></div>
+
+</body>
+</html>

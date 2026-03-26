@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>QuickQleen</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .bg-cream { background-color: #F9F7F2; }
+        .text-forest { color: #2D5A27; }
+        .bg-forest { background-color: #2D5A27; }
+        .bg-orange-accent { background-color: #FF8A00; }
+        [x-cloak] { display: none !important; }
+        
+        /* Smooth Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #2D5A27; border-radius: 10px; }
+
+        /* Pulsing Dot Animation for Live Map */
+        @keyframes pulse-dot {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 0.3; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+        .pulse { animation: pulse-dot 2s infinite ease-in-out; }
+    </style>
+</head>
+<body class="bg-cream font-sans min-h-screen pb-20 lg:pb-0" 
+      x-data="{ 
+        bookingModal: false, 
+        currentTab: 'home', 
+        notificationsOpen: false,
+        notificationCount: 2 
+      }">
+
+    <nav class="bg-white p-4 shadow-sm border-b border-gray-100 sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-forest cursor-pointer italic tracking-tight" @click="currentTab = 'home'">we clean.</h1>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <div class="flex space-x-6">
+                    <button @click="currentTab = 'home'" :class="currentTab === 'home' ? 'text-forest font-bold border-b-2 border-forest' : 'text-gray-400 hover:text-forest'" class="transition-all pb-1">Dashboard</button>
+                    <button @click="currentTab = 'bookings'" :class="currentTab === 'bookings' ? 'text-forest font-bold border-b-2 border-forest' : 'text-gray-400 hover:text-forest'" class="transition-all pb-1">My Bookings</button>
+                    <button @click="alert('Referral Program Active!')" class="text-gray-400 hover:text-forest transition-all pb-1">Rewards</button>
+                    <button @click="currentTab = 'support'" :class="currentTab === 'support' ? 'text-forest font-bold border-b-2 border-forest' : 'text-gray-400 hover:text-forest'" class="transition-all pb-1">Support</button>
+                </div>
+                
+                <div class="flex items-center space-x-4 border-l pl-6 border-gray-100">
+                    <div class="relative">
+                        <button @click="notificationsOpen = !notificationsOpen" class="text-forest p-2 focus:outline-none relative hover:bg-cream rounded-full transition">
+                            <i class="fas fa-bell text-lg"></i>
+                            <template x-if="notificationCount > 0">
+                                <span class="absolute top-1.5 right-1.5 bg-orange-500 w-2 h-2 rounded-full border border-white"></span>
+                            </template>
+                        </button>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-forest flex items-center justify-center text-white font-bold cursor-pointer hover:scale-105 transition" @click="currentTab = 'settings'">AB</div>
+                </div>
+            </div>
+
+            <div class="md:hidden flex items-center space-x-3">
+                <button @click="notificationsOpen = !notificationsOpen" class="text-forest relative p-2">
+                    <i class="fas fa-bell text-xl"></i>
+                    <template x-if="notificationCount > 0">
+                        <span class="absolute top-1 right-1 bg-orange-500 w-2.5 h-2.5 rounded-full border-2 border-white"></span>
+                    </template>
+                </button>
+                <div class="w-10 h-10 rounded-full bg-forest flex items-center justify-center text-white text-sm font-bold" @click="currentTab = 'settings'">AB</div>
+            </div>
+        </div>
+
+        <div x-show="notificationsOpen" 
+             @click.away="notificationsOpen = false" 
+             x-cloak 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-[-10px]"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             class="absolute right-4 md:right-10 lg:right-[calc((100vw-1152px)/2)] mt-2 w-[calc(100vw-2rem)] md:w-80 bg-white rounded-3xl shadow-2xl border border-gray-100 p-5 z-50">
+            
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-xs font-black uppercase text-gray-400 tracking-widest">Recent Alerts</h4>
+                <button @click="notificationsOpen = false" class="text-gray-300 hover:text-forest"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="space-y-3 max-h-64 overflow-y-auto custom-scroll">
+                <div class="text-[12px] p-4 bg-cream/50 rounded-2xl font-bold border-l-4 border-orange-500 shadow-sm">
+                    <p class="text-forest">Maria is 10 mins away!</p>
+                    <span class="text-[10px] text-gray-400 font-medium">Uyo, Akwa Ibom</span>
+                </div>
+                <div class="text-[12px] p-4 bg-cream/50 rounded-2xl font-bold border-l-4 border-forest shadow-sm">
+                    <p class="text-forest">Payment successful: &#8358;25,000</p>
+                    <span class="text-[10px] text-gray-400 font-medium">Transaction #BK-9920</span>
+                </div>
+            </div>
+            
+            <button @click="notificationCount = 0; notificationsOpen = false" class="w-full mt-4 py-3 text-[11px] font-black uppercase text-forest bg-cream rounded-xl hover:bg-forest hover:text-white transition-colors">Clear All Notifications</button>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto py-6 lg:py-10 px-4">
+        
+        <div x-show="currentTab === 'home'" x-transition:enter="transition ease-out duration-300">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
+                <div>
+                    <h2 class="text-3xl lg:text-4xl font-bold text-forest italic">Hello, Abigail!</h2>
+                    <p class="text-gray-500 mt-2 font-medium italic">Ready for a sparkling clean home ?
+                    <!--at <span class="text-forest font-bold">Buyam.online</span>?-->
+                    </p>
+                </div>
+                <button @click="bookingModal = true" class="w-full md:w-auto bg-orange-accent text-white px-8 py-4 rounded-full font-bold shadow-xl transform transition hover:scale-105 active:scale-95">
+                    <i class="fas fa-plus mr-2"></i> Book a Service
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="bg-forest text-white rounded-[2.5rem] overflow-hidden shadow-2xl relative">
+                        <div class="p-6 lg:p-10 pb-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="bg-orange-accent text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">In Transit</span>
+                                    <h3 class="text-2xl lg:text-4xl font-bold mt-4 italic">Regular Home Maintenance</h3>
+                                    <p class="mt-2 opacity-80 text-lg flex items-center font-medium">Today • 10:00 AM</p>
+                                </div>
+                                <div class="bg-white/10 px-4 py-2 rounded-2xl backdrop-blur-sm border border-white/20">
+                                    <p class="text-[10px] font-black uppercase opacity-60">ETA</p>
+                                    <p class="text-xl font-black">12 MINS</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mx-6 mb-6 h-48 lg:h-64 bg-slate-200 rounded-[2rem] relative overflow-hidden shadow-inner border border-white/10 group">
+                            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#2D5A27 1px, transparent 1px); background-size: 20px 20px;"></div>
+                            
+                            <div class="absolute top-1/4 right-1/4 text-forest flex flex-col items-center">
+                                <div class="bg-white w-8 h-8 rounded-full shadow-lg flex items-center justify-center mb-1 border-2 border-forest">
+                                    <i class="fas fa-home text-sm"></i>
+                                </div>
+                                <span class="bg-forest text-white text-[8px] font-bold px-2 py-0.5 rounded-full shadow-sm uppercase">You</span>
+                            </div>
+
+                            <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40">
+                                <path d="M 50 180 Q 150 120, 280 60" fill="transparent" stroke="#2D5A27" stroke-width="3" stroke-dasharray="8,8" />
+                            </svg>
+
+                            <div class="absolute bottom-12 left-12 flex flex-col items-center">
+                                <div class="relative">
+                                    <div class="absolute -inset-4 bg-orange-500/20 rounded-full pulse"></div>
+                                    <div class="bg-orange-accent w-10 h-10 rounded-full shadow-xl flex items-center justify-center border-2 border-white relative z-10">
+                                        <i class="fas fa-car-side text-white text-sm"></i>
+                                    </div>
+                                </div>
+                                <span class="bg-white text-forest text-[8px] font-black px-2 py-0.5 rounded-full shadow-sm mt-2 border border-gray-100 uppercase tracking-tighter">Maria is here</span>
+                            </div>
+
+                            <div class="absolute bottom-3 right-4 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full text-[9px] font-black text-forest uppercase tracking-widest shadow-sm">
+                                <span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></span> Live Track
+                            </div>
+                        </div>
+
+                        <div class="px-6 pb-6 lg:px-10 lg:pb-10">
+                            <div class="flex items-center justify-between bg-white/10 p-4 rounded-3xl backdrop-blur-md border border-white/5">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-xl overflow-hidden border border-white/20">
+                                        <i class="fas fa-user-sparkles text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] opacity-60 uppercase font-black tracking-tight">Assigned Pro</p>
+                                        <p class="font-bold text-lg">Maria Effiong</p>
+                                    </div>
+                                </div>
+                                <button @click="alert('Opening chat with Maria...')" class="bg-orange-accent p-4 rounded-2xl hover:bg-white hover:text-orange-500 transition-all shadow-lg active:scale-90">
+                                    <i class="fas fa-comment-dots text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-8">
+                            <h4 class="text-xl font-bold text-forest italic">Recent History</h4>
+                            <button @click="currentTab = 'bookings'" class="text-orange-500 text-sm font-black uppercase tracking-widest hover:underline">View All</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-5 border border-gray-50 rounded-3xl hover:bg-cream/50 transition-all cursor-pointer group">
+                                <div class="flex items-center space-x-4">
+                                    <div class="p-4 bg-cream rounded-2xl text-forest group-hover:bg-forest group-hover:text-white transition-colors"><i class="fas fa-check-circle text-lg"></i></div>
+                                    <div>
+                                        <p class="font-black text-gray-800">Deep Kitchen Cleaning</p>
+                                        <p class="text-xs text-gray-400 font-bold uppercase tracking-tight">Feb 15, 2026 • Verified</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-black text-forest text-lg">&#8358;25,000</p>
+                                    <span class="text-[9px] bg-green-100 text-green-600 px-2 py-1 rounded-md font-black uppercase">Paid</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-orange-accent p-8 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden group">
+                        <h4 class="text-2xl font-bold italic leading-tight">Refer &<br>Earn Credit</h4>
+                        <p class="mt-3 text-sm opacity-90 font-medium">Get &#8358;5,000 credit for every new home you refer.</p>
+                        <button @click="alert('Referral link copied!')" class="w-full mt-8 py-4 bg-white text-orange-500 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg hover:shadow-orange-600/20 transition-all active:scale-95">
+                            Copy Share Link
+                        </button>
+                        <i class="fas fa-gift absolute -bottom-6 -right-6 text-white/10 text-9xl transform -rotate-12 group-hover:rotate-0 transition-transform duration-500"></i>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                        <h4 class="text-forest font-black uppercase text-xs tracking-widest mb-4">Customer Rating</h4>
+                        <div class="flex text-orange-400 space-x-1 mb-4 text-lg">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 italic leading-relaxed font-medium">"Abigail is a top-tier client. Clear instructions and always reachable."</p>
+                        <div class="mt-6 pt-6 border-t border-gray-50">
+                            <span class="text-[10px] font-black text-forest uppercase tracking-widest">Feedback by Maria G.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="currentTab === 'bookings'" x-cloak x-transition class="max-w-2xl mx-auto py-10">
+            <h2 class="text-3xl font-bold text-forest italic mb-8">Booking History</h2>
+            <div class="bg-white rounded-[2.5rem] p-12 text-center border border-gray-100 shadow-sm">
+                <i class="fas fa-calendar-alt text-4xl text-forest mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-800">No other active bookings</h3>
+                <p class="text-gray-400 mt-2 font-medium">Bookings from Buyam.online appear here.</p>
+            </div>
+        </div>
+
+        <div x-show="currentTab === 'settings'" x-cloak x-transition class="max-w-2xl mx-auto py-10">
+            <h2 class="text-3xl font-bold text-forest italic mb-8">Profile Settings</h2>
+            <div class="bg-white p-6 rounded-3xl flex items-center justify-between border border-gray-100 mb-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-cream rounded-2xl flex items-center justify-center text-forest"><i class="fas fa-bell"></i></div>
+                    <span class="font-bold text-forest">App Notifications</span>
+                </div>
+                <div class="w-12 h-6 bg-forest rounded-full relative p-1 cursor-pointer">
+                    <div class="bg-white w-4 h-4 rounded-full float-right"></div>
+                </div>
+            </div>
+            <button @click="currentTab = 'home'" class="w-full py-4 text-red-400 font-bold uppercase text-xs tracking-widest">Logout</button>
+        </div>
+    </main>
+
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-4 flex justify-between items-center z-50 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <button @click="currentTab = 'home'" :class="currentTab === 'home' ? 'text-forest' : 'text-gray-300'" class="flex flex-col items-center">
+            <i class="fas fa-th-large text-xl"></i><span class="text-[9px] mt-1 font-black">Home</span>
+        </button>
+        <button @click="currentTab = 'bookings'" :class="currentTab === 'bookings' ? 'text-forest' : 'text-gray-300'" class="flex flex-col items-center">
+            <i class="fas fa-calendar-check text-xl"></i><span class="text-[9px] mt-1 font-black">Visits</span>
+        </button>
+        <button @click="bookingModal = true" class="bg-orange-accent text-white w-14 h-14 rounded-2xl flex items-center justify-center -mt-14 shadow-2xl border-4 border-cream transform active:scale-90 transition">
+            <i class="fas fa-plus text-xl"></i>
+        </button>
+        <button @click="alert('Rewards Program: 0 points')" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-gift text-xl"></i><span class="text-[9px] mt-1 font-black">Points</span>
+        </button>
+        <button @click="currentTab = 'settings'" :class="currentTab === 'settings' ? 'text-forest' : 'text-gray-300'" class="flex flex-col items-center">
+            <i class="fas fa-user text-xl"></i><span class="text-[9px] mt-1 font-black">Profile</span>
+        </button>
+    </div>
+
+    <div x-show="bookingModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div @click="bookingModal = false" class="absolute inset-0 bg-forest/80 backdrop-blur-md"></div>
+        <div class="bg-white w-full max-w-lg rounded-[3rem] relative z-10 p-8 shadow-2xl overflow-y-auto max-h-[90vh]" 
+             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="scale-90 opacity-0" x-transition:enter-end="scale-100 opacity-100">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-3xl font-bold text-forest italic">Book Service</h3>
+                <button @click="bookingModal = false" class="text-gray-300 hover:text-forest transition-colors p-2"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Type</label>
+                    <select class="w-full p-5 bg-cream rounded-3xl border-none font-bold text-forest">
+                        <option>Standard Maintenance</option>
+                        <option>Deep Cleaning</option>
+                    </select>
+                </div>
+                <div class="bg-forest/5 p-6 rounded-3xl border border-forest/10 flex justify-between items-center">
+                    <span class="font-bold text-forest text-sm">Estimated Total</span>
+                    <span class="text-2xl font-black text-forest italic">&#8358;25,000</span>
+                </div>
+                <button @click="alert('Confirming via Buyam.online...'); bookingModal = false" class="w-full bg-forest text-white py-5 rounded-3xl font-black uppercase tracking-widest text-sm shadow-xl active:scale-95 transition">Confirm Slot</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
